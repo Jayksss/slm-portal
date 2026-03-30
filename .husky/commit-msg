@@ -1,0 +1,16 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+branch_name=$(git rev-parse --abbrev-ref HEAD)
+ticket=$(echo $branch_name | grep -oE "SLM-[0-9]+")
+
+commit_msg=$(cat $1)
+
+if [ -z "$ticket" ]; then
+  echo "❌ 브랜치에 Jira 티켓번호 없음 (예: feature/SLM-123-xxx)"
+  exit 1
+fi
+
+if ! echo "$commit_msg" | grep -q "$ticket"; then
+  echo "$ticket $commit_msg" > $1
+fi
